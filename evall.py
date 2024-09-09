@@ -1,54 +1,101 @@
-def rent(movie_no,cust_no,Rental_T): 
-    if movie_no not in Rental_T:
-        Rental_T.append({movie_no:cust_no})
-        i=i+1
-    else:
-        print("Movie already rented.....")
-    
-def rent(movie_no,cust_no,Rental_T): 
-    if movie_no in Rental_T:
-        Rental_T.delete({movie_no:cust_no})
-        i=i-1
-    else:
-        print("Movie not returned.....")
-        
-def customers_d(customers):
-    print(customers)
-    
-def available(Rental_T,available,movie_no):
-    if movie_no not in Rental_T:
-        available.append(movie_no)
-        print(movie_no)
-    
-def details(Rental_T):
-    print(Rental_T)
-    
-int main()
-{
-    print("Choose an option:")
-    print("1.Rent")
-    print("2.Return")
-    print("3.Generate rental report")
-    choice=int(input("Enter"))
-    
-    movies=[{1:"DDLJ"},{2,"K3G"},{3,"Singham"}]
-    customers=[{1,"Raj"},{2,"Ram"},{3,"Suman"}]
-    
-    Rental_t=[]
-    available=[]
-    
-    if choice==1:
-        m=int(input("Enter movie no:"))
-        n=int(input("Enter customer id:"))
-        rent(m,n,Rental_T)
-    else if choice==2:
-        m=int(input("Enter movie no:"))
-        n=int(input("Enter customer id:"))
-        rent(m,n,Rental_T)
-    else if choice==3:
-        details(Rental_T)
-    else:
-        print("Choose a right option")
-     
-    
+# Movie Rental Service Simulation
+
+# Sample data
+movies = [
+    {'id': 1, 'title': 'The Matrix', 'available': True},
+    {'id': 2, 'title': 'Inception', 'available': True},
+    {'id': 3, 'title': 'The Godfather', 'available': True},
+    {'id': 4, 'title': 'Pulp Fiction', 'available': True}
+]
+
+customers = {
+    'cust1': {'name': 'Madhav', 'rented_movies': []},
+    'cust2': {'name': 'Simran', 'rented_movies': []},
 }
+
+rentals = []
+
+def list_available_movies():
+    print("\nAvailable Movies:")
+    for movie in movies:
+        if movie['available']:
+            print(f"ID: {movie['id']}, Title: {movie['title']}")
+
+def rent_movie(customer_id, movie_id):
+    customer = customers.get(customer_id)
+    if not customer:
+        print("Customer not found!")
+        return
+
+    movie = next((m for m in movies if m['id'] == movie_id), None)
+    if not movie:
+        print("Movie not found!")
+        return
+
+    if not movie['available']:
+        print("Movie is not available for rent!")
+        return
+
+    movie['available'] = False
+    customer['rented_movies'].append(movie_id)
+    rentals.append({'customer_id': customer_id, 'movie_id': movie_id})
+    print(f"Movie '{movie['title']}' rented to customer '{customer['name']}'.")
+
+def return_movie(customer_id, movie_id):
+    customer = customers.get(customer_id)
+    if not customer:
+        print("Customer not found!")
+        return
+
+    if movie_id not in customer['rented_movies']:
+        print("Movie not rented by this customer!")
+        return
+
+    movie = next((m for m in movies if m['id'] == movie_id), None)
+    if not movie:
+        print("Movie not found!")
+        return
+
+    movie['available'] = True
+    customer['rented_movies'].remove(movie_id)
+    rentals.append({'customer_id': customer_id, 'movie_id': movie_id, 'return': True})
+    print(f"Movie '{movie['title']}' returned by customer '{customer['name']}'.")
+
+def generate_rental_report():
+    print("\nRental Report:")
+    for rental in rentals:
+        customer = customers.get(rental['customer_id'])
+        movie = next((m for m in movies if m['id'] == rental['movie_id']), None)
+        if rental.get('return'):
+            print(f"Movie '{movie['title']}' returned by customer '{customer['name']}'.")
+        else:
+            print(f"Movie '{movie['title']}' rented to customer '{customer['name']}'.")
+
+# Example usage
+if __name__ == "__main__":
+    while True:
+        print("\nMovie Rental Service")
+        print("1. List Available Movies")
+        print("2. Rent Movie")
+        print("3. Return Movie")
+        print("4. Generate Rental Report")
+        print("5. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            list_available_movies()
+        elif choice == '2':
+            customer_id = input("Enter customer ID: ")
+            movie_id = int(input("Enter movie ID to rent: "))
+            rent_movie(customer_id, movie_id)
+        elif choice == '3':
+            customer_id = input("Enter customer ID: ")
+            movie_id = int(input("Enter movie ID to return: "))
+            return_movie(customer_id, movie_id)
+        elif choice == '4':
+            generate_rental_report()
+        elif choice == '5':
+            break
+        else:
+            print("Invalid choice. Please try again.")
